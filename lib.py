@@ -1,3 +1,7 @@
+from textblob import TextBlob
+from random import *
+from logging import logger
+
 # Sentences we'll respond with if the user greeted us
 GREETING_KEYWORDS = ("hello", "hi", "greetings", "sup", "what's up",)
 
