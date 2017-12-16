@@ -1,5 +1,5 @@
 import lib
 
 x = input()
-y = lib.check_for_greeting(x)
+y = lib.response(x)
 print(y)

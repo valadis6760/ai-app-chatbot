@@ -1,16 +1,7 @@
 from __future__ import print_function, unicode_literals
 from textblob import TextBlob
-import random
-from config import FILTER_WORDS
-import logging
+from config import *
 import os
-
-import logging
-
-# Sentences we'll respond with if the user greeted us
-GREETING_KEYWORDS = ("hello", "hi", "greetings", "sup", "what's up")
-
-GREETING_RESPONSES = ["'sup bro", "hey", "*nods*", "hey you get my snap?"]
 
 def check_for_greeting(sentence):
     words = sentence.split()
@@ -41,10 +32,24 @@ def response(sentence):
     if not resp:
         resp = random.choice(NONE_RESPONSES)
 
-    logger.info("Returning phrase'%s'", resp)
-    filter_response(resp)
+    #logger.info("Returning phrase'%s'", resp)
+    #filter_response(resp)
 
     return resp
+
+def preprocess_text(sentence):
+    """Handle some weird edge cases in parsing, like 'i' needing to be capitalized
+    to be correctly identified as a pronoun"""
+    cleaned = []
+    words = sentence.split(' ')
+    for w in words:
+        if w == 'i':
+            w = 'I'
+        if w == "i'm":
+            w = "I'm"
+        cleaned.append(w)
+
+    return ' '.join(cleaned)
 
 def find_candidates_parts_of_speech(parsed):
     pronoun = None
@@ -58,7 +63,7 @@ def find_candidates_parts_of_speech(parsed):
         adjective = find_adjective(sent)
         verb = find_verb(sent)
 
-    logger.info("Pronoun=%s, noun=%s, adjective=%s, verb=%s", pronoun, noun, adjective, verb)
+    #logger.info("Pronoun=%s, noun=%s, adjective=%s, verb=%s", pronoun, noun, adjective, verb)
     return pronoun, noun, adjective, verb
 
 def find_pronoun(sent):
@@ -75,6 +80,39 @@ def find_pronoun(sent):
             pronoun = 'You'
     return pronoun
 
+def find_verb(sent):
+    """Pick a candidate verb for the sentence."""
+    verb = None
+    pos = None
+    for word, part_of_speech in sent.pos_tags:
+        if part_of_speech.startswith('VB'):  # This is a verb
+            verb = word
+            pos = part_of_speech
+            break
+    return verb, pos
+
+
+def find_noun(sent):
+    """Given a sentence, find the best candidate noun."""
+    noun = None
+
+    if not noun:
+        for w, p in sent.pos_tags:
+            if p == 'NN':  # This is a noun
+                noun = w
+                break
+    #if noun:
+        #logger.info("Found noun: %s", noun)
+    return noun
+
+def find_adjective(sent):
+    """Given a sentence, find the best candidate adjective."""
+    adj = None
+    for w, p in sent.pos_tags:
+        if p == 'JJ':  # This is an adjective
+            adj = w
+            break
+    return adj
 
 
 
@@ -115,23 +153,6 @@ def check_for_comment_about_bot(pronoun, noun, adjective):
             resp = random.choice(SELF_VERBS_WITH_ADJECTIVE).format(**{'adjective': adjective})
     return resp
 
-# Template for responses that include a direct noun which is indefinite/uncountable
-SELF_VERBS_WITH_NOUN_CAPS_PLURAL = [
-    "My last startup totally crushed the {noun} vertical",
-    "Were you aware I was a serial entrepreneur in the {noun} sector?",
-    "My startup is Uber for {noun}",
-    "I really consider myself an expert on {noun}",
-]
-
-SELF_VERBS_WITH_NOUN_LOWER = [
-    "Yeah but I know a lot about {noun}",
-    "My bros always ask me about {noun}",
-]
-
-SELF_VERBS_WITH_ADJECTIVE = [
-    "I'm personally building the {adjective} Economy",
-    "I consider myself to be a {adjective}preneur",
-]
 
 def construct_response(pronoun, noun, verb):
     """No special cases matched, so we're going to try to construct a full sentence that uses as much
@@ -160,7 +181,11 @@ def construct_response(pronoun, noun, verb):
 
     return " ".join(resp)
 
-def filter_response(resp):
+def starts_with_vowel(word):
+    """Check for pronoun compability -- 'a' vs. 'an'"""
+    return True if word[0] in 'aeiou' else False
+
+'''def filter_response(resp):
     """Don't allow any words to match our filter list"""
     tokenized = resp.split(' ')
     for word in tokenized:
@@ -169,3 +194,4 @@ def filter_response(resp):
         for s in FILTER_WORDS:
             if word.lower().startswith(s):
                 raise UnacceptableUtteranceException()
+'''
