@@ -1,23 +1,30 @@
+from __future__ import print_function, unicode_literals
 from textblob import TextBlob
-from random import *
-from logging import logger
+import random
+from config import FILTER_WORDS
+import logging
+import os
+
+import logging
 
 # Sentences we'll respond with if the user greeted us
-GREETING_KEYWORDS = ("hello", "hi", "greetings", "sup", "what's up",)
+GREETING_KEYWORDS = ("hello", "hi", "greetings", "sup", "what's up")
 
 GREETING_RESPONSES = ["'sup bro", "hey", "*nods*", "hey you get my snap?"]
 
 def check_for_greeting(sentence):
+    words = sentence.split()
     """If any of the words in the user's input was a greeting, return a greeting response"""
-    for word in sentence.words:
+    for word in words:
         if word.lower() in GREETING_KEYWORDS:
             return random.choice(GREETING_RESPONSES)
+
 
 def response(sentence):
     cleaned = preprocess_text(sentence)
     parsed = TextBlob(cleaned)
 
-    pronoun, noun, adjective, verb = find_candidate_parts_of_speech(parsed)
+    pronoun, noun, adjective, verb = find_candidates_parts_of_speech(parsed)
     resp = check_for_comment_about_bot(pronoun, noun, adjective)
 
     if not resp:
@@ -54,7 +61,6 @@ def find_candidates_parts_of_speech(parsed):
     logger.info("Pronoun=%s, noun=%s, adjective=%s, verb=%s", pronoun, noun, adjective, verb)
     return pronoun, noun, adjective, verb
 
-
 def find_pronoun(sent):
     """Given a sentence, find a preferred pronoun to respond with. Returns None if no candidate
     pronoun is found in the input"""
@@ -68,6 +74,32 @@ def find_pronoun(sent):
             # If the user mentioned themselves, then they will definitely be the pronoun
             pronoun = 'You'
     return pronoun
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def check_for_comment_about_bot(pronoun, noun, adjective):
     """Check if the user's input was about the bot itself, in which case try to fashion a response
