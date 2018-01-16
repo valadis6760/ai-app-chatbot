@@ -90,3 +90,5 @@ COMMENTS_ABOUT_SELF = [
     "I worked really hard on that",
     "My Klout score is {}".format(random.randint(100, 500)),
 ]
+
+TEST_LIST = ["The weather is not good", "weather sucks"]

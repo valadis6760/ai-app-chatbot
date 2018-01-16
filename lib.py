@@ -18,6 +18,10 @@ def response(sentence):
     pronoun, noun, adjective, verb = find_candidates_parts_of_speech(parsed)
     resp = check_for_comment_about_bot(pronoun, noun, adjective)
 
+
+    if noun=="weather":
+        resp = random.choice(TEST_LIST)
+
     if not resp:
         resp = check_for_greeting(parsed)
 
