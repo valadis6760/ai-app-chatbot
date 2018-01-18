@@ -17,8 +17,7 @@ def response(sentence):
     parsed = TextBlob(cleaned)
 
     pronoun, noun, adjective, verb = find_candidates_parts_of_speech(parsed)
-    #resp = check_for_comment_about_bot(pronoun, noun, adjective)
-    resp = None
+    resp = check_for_comment_about_bot(pronoun, noun, adjective)
 
     if not resp:
         for bye_word in BYE_LIST:
@@ -27,7 +26,7 @@ def response(sentence):
 
     if not resp:
         if noun=="mobile":
-            if verb[0]=="buy":
+            if "buy" in verb[0]:
                 resp = "what brand do you prefer?"
 
     if not resp:
@@ -98,13 +97,12 @@ def find_pronoun(sent):
 
 def find_verb(sent):
     """Pick a candidate verb for the sentence."""
-    verb = None
-    pos = None
+    verb = []
+    pos = []
     for word, part_of_speech in sent.pos_tags:
         if part_of_speech.startswith('VB'):  # This is a verb
-            verb = word
-            pos = part_of_speech
-            break
+            verb.append(word)
+            pos.append(part_of_speech)
     return verb, pos
 
 
@@ -132,7 +130,7 @@ def find_adjective(sent):
     return adj
 
 
-'''def check_for_comment_about_bot(pronoun, noun, adjective):
+def check_for_comment_about_bot(pronoun, noun, adjective):
     """Check if the user's input was about the bot itself, in which case try to fashion a response
     that feels right based on their input. Returns the new best sentence, or None."""
     resp = None
@@ -145,7 +143,7 @@ def find_adjective(sent):
         else:
             resp = random.choice(SELF_VERBS_WITH_ADJECTIVE).format(**{'adjective': adjective})
     return resp
-'''
+
 
 def construct_response(pronoun, noun, verb):
     """No special cases matched, so we're going to try to construct a full sentence that uses as much
