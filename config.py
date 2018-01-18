@@ -1,7 +1,7 @@
 import random
 
 # Sentences we'll respond with if the user greeted us
-GREETING_KEYWORDS = ("hello", "hi", "greetings", "sup", "what's up")
+GREETING_KEYWORDS = ["hello", "hi", "greetings", "sup", "what's up"]
 
 GREETING_RESPONSES = ["'sup bro", "hey", "*nods*", "hey you get my snap?"]
 
@@ -92,3 +92,7 @@ COMMENTS_ABOUT_SELF = [
 ]
 
 TEST_LIST = ["The weather is not good", "weather sucks"]
+
+BYE_LIST = ["bye", "goodbye", "see ya"]
+
+BYE_ANSWER = ["bye bro", "goodbye for now"]

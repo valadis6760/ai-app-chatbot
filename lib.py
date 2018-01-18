@@ -3,6 +3,7 @@ from textblob import TextBlob
 from config import *
 import os
 
+
 def check_for_greeting(sentence):
     words = sentence.split()
     """If any of the words in the user's input was a greeting, return a greeting response"""
@@ -16,11 +17,18 @@ def response(sentence):
     parsed = TextBlob(cleaned)
 
     pronoun, noun, adjective, verb = find_candidates_parts_of_speech(parsed)
-    resp = check_for_comment_about_bot(pronoun, noun, adjective)
+    #resp = check_for_comment_about_bot(pronoun, noun, adjective)
+    resp = None
 
+    if not resp:
+        for bye_word in BYE_LIST:
+            if bye_word in sentence:
+                resp = random.choice(BYE_ANSWER)
 
-    if noun=="weather":
-        resp = random.choice(TEST_LIST)
+    if not resp:
+        if noun=="mobile":
+            if verb[0]=="buy":
+                resp = "what brand do you prefer?"
 
     if not resp:
         resp = check_for_greeting(parsed)
@@ -41,6 +49,7 @@ def response(sentence):
 
     return resp
 
+
 def preprocess_text(sentence):
     """Handle some weird edge cases in parsing, like 'i' needing to be capitalized
     to be correctly identified as a pronoun"""
@@ -54,6 +63,7 @@ def preprocess_text(sentence):
         cleaned.append(w)
 
     return ' '.join(cleaned)
+
 
 def find_candidates_parts_of_speech(parsed):
     pronoun = None
@@ -70,6 +80,7 @@ def find_candidates_parts_of_speech(parsed):
     #logger.info("Pronoun=%s, noun=%s, adjective=%s, verb=%s", pronoun, noun, adjective, verb)
     return pronoun, noun, adjective, verb
 
+
 def find_pronoun(sent):
     """Given a sentence, find a preferred pronoun to respond with. Returns None if no candidate
     pronoun is found in the input"""
@@ -83,6 +94,7 @@ def find_pronoun(sent):
             # If the user mentioned themselves, then they will definitely be the pronoun
             pronoun = 'You'
     return pronoun
+
 
 def find_verb(sent):
     """Pick a candidate verb for the sentence."""
@@ -109,6 +121,7 @@ def find_noun(sent):
         #logger.info("Found noun: %s", noun)
     return noun
 
+
 def find_adjective(sent):
     """Given a sentence, find the best candidate adjective."""
     adj = None
@@ -119,31 +132,7 @@ def find_adjective(sent):
     return adj
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def check_for_comment_about_bot(pronoun, noun, adjective):
+'''def check_for_comment_about_bot(pronoun, noun, adjective):
     """Check if the user's input was about the bot itself, in which case try to fashion a response
     that feels right based on their input. Returns the new best sentence, or None."""
     resp = None
@@ -156,7 +145,7 @@ def check_for_comment_about_bot(pronoun, noun, adjective):
         else:
             resp = random.choice(SELF_VERBS_WITH_ADJECTIVE).format(**{'adjective': adjective})
     return resp
-
+'''
 
 def construct_response(pronoun, noun, verb):
     """No special cases matched, so we're going to try to construct a full sentence that uses as much
@@ -185,9 +174,11 @@ def construct_response(pronoun, noun, verb):
 
     return " ".join(resp)
 
+
 def starts_with_vowel(word):
     """Check for pronoun compability -- 'a' vs. 'an'"""
     return True if word[0] in 'aeiou' else False
+
 
 '''def filter_response(resp):
     """Don't allow any words to match our filter list"""
